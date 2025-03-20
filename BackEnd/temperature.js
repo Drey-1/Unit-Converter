@@ -55,6 +55,6 @@ temperature.post("/temperature",(req,res) => {
     }
 
     return res.json({ convertedValue });
-})
+});
 
 module.exports = temperature;
