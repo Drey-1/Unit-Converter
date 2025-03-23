@@ -27,7 +27,6 @@ function KtoF(value){
 
 temperature.post("/temperature",(req,res) => {
     let { value, fromUnit, toUnit} = req.body;
-    let convertedValue;
     if(fromUnit === toUnit){
         return res.json({ convertedValue : value });
     }
