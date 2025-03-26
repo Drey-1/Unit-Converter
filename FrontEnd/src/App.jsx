@@ -6,37 +6,57 @@ function App() {
     weight: ["milligram", "gram", "kilogram", "ounce", "pound"],
     temperature: ["celsius", "fahrenheit", "kelvin"],
   };
+  
+  const valueMensure = {
+    "millimeter": "Mm",
+    "centimeter": "Cm",
+    "meter": "M",
+    "kilometer": "Km",
+    "inch": "I",
+    "foot": "F",
+    "yard": "Y",
+    "mile": "Mi",
+    "milligram": "Mg",
+    "gram": "G",
+    "kilogram": "Kg",
+    "ounce": "O",
+    "pound": "P",
+    "celsius": "C",
+    "fahrenheit": "F",
+    "kelvin": "K",
+  };
 
-  const [actuallyPag, setActuallyPag] = useState("length"); // Estado da categoria ativa
-  const [value, setValue] = useState(""); // Estado do valor a converter
-  const [fromUnit, setFromUnit] = useState(""); // Estado da unidade de origem
-  const [toUnit, setToUnit] = useState(""); // Estado da unidade de destino
-  const [result, setResult] = useState(null); // Estado para armazenar o resultado da conversão
+  const [actuallyPag, setActuallyPag] = useState("length");
+  const [result, setResult] = useState(null);
+  const [value, setValue] = useState("");
+  const [fromUnit, setFromUnit] = useState("");
+  const [toUnit, setToUnit] = useState("");
 
-  const handleConvert = async () => {
-    if (!value || !fromUnit || !toUnit) {
-      alert("Preencha todos os campos antes de converter!");
-      return;
-    }
-
+  async function Convert() {
     try {
-      const response = await fetch(`http://localhost:3033/${actuallyPag}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const response = await fetch("http://localhost:3033/" + actuallyPag, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({
-          value: Number(value),
-          fromUnit,
-          toUnit,
-        }),
+          value: value,
+          fromUnit: fromUnit,
+          toUnit: toUnit
+        })
       });
 
+      if (!response.ok) {
+        throw new Error('Conversion failed');
+      }
+
       const data = await response.json();
-      setResult(data.result); // Atualiza o estado com o resultado da conversão
+      setResult(data.convertedValue);
     } catch (error) {
-      console.error("Erro na requisição:", error);
-      alert("Erro ao converter. Tente novamente.");
+      console.error("Error converting units:", error);
+      setResult(null);
     }
-  };
+  }
 
   return (
     <div className="w-screen h-screen bg-yellow-50 flex justify-center">
@@ -49,7 +69,7 @@ function App() {
             <button
               key={category}
               onClick={() => setActuallyPag(category)}
-              className={`text-lg font-semibold transition-colors ${
+              className={`text-lg cursor-pointer font-semibold transition-colors ${
                 actuallyPag === category ? "text-blue-500" : "text-gray-700"
               }`}
             >
@@ -67,46 +87,44 @@ function App() {
             className="border-2 rounded-md p-1 max-w-80 border-blue-500 focus:border-blue-500 focus:outline-none"
           />
           <label htmlFor="to">Enter the Unit to convert:</label>
-          <select
-            className="select"
-            name="to"
+          <select 
+            className="select" 
+            name="to" 
             id="to"
             value={toUnit}
             onChange={(e) => setToUnit(e.target.value)}
           >
-            <option value="">Select unit</option>
-            {measures[actuallyPag].map((unit) => (
-              <option key={unit} value={unit}>
-                {unit}
+            {measures[actuallyPag].map((value) => (
+              <option key={value} value={valueMensure[value]}>
+                {value}
               </option>
             ))}
           </select>
           <label htmlFor="from">Unit to convert from:</label>
-          <select
-            className="select"
-            name="from"
+          <select 
+            className="select" 
+            name="from" 
             id="from"
             value={fromUnit}
             onChange={(e) => setFromUnit(e.target.value)}
           >
-            <option value="">Select unit</option>
-            {measures[actuallyPag].map((unit) => (
-              <option key={unit} value={unit}>
-                {unit}
+            {measures[actuallyPag].map((value) => (
+              <option key={value} value={valueMensure[value]}>
+                {value}
               </option>
             ))}
           </select>
-          <button
-            onClick={handleConvert}
+          <button 
+            onClick={Convert} 
             className="bg-blue-500 active:bg-blue-700 cursor-pointer text-white p-2 w-40 rounded-2xl text-2xl mt-5"
           >
             Convert
           </button>
-
-          {/* Exibir o resultado abaixo do botão se existir */}
+          
           {result !== null && (
-            <div className="mt-5 text-xl font-bold text-blue-600">
-              Result: {result}
+            <div className="mt-4">
+              <span>Result: </span>
+              <h2 className="text-blue-500 text-3xl">{result}</h2>
             </div>
           )}
         </div>
@@ -116,4 +134,3 @@ function App() {
 }
 
 export default App;
-

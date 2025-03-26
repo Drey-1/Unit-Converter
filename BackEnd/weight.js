@@ -97,7 +97,7 @@ weight.post("/weight",(req,res) => {
     const key = `${fromUnit}-${toUnit}`;
     const conversionFunc = converterMap[key];
     if(conversionFunc){
-        return res.json({ convertedValue : conversionFunc(value) })
+        return res.json({ convertedValue : conversionFunc(Number(value))})
     } else {
         return res.status(400).json({ error: "Conversion not supported" });
     }
